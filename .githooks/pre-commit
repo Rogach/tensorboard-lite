@@ -1,0 +1,5 @@
+#!/bin/bash
+
+if git diff --staged -- ':(exclude).githooks' | grep -C 2 NOCOMMIT; then
+    exit 1
+fi

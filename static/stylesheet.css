@@ -1,0 +1,54 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+.container {
+    display: grid;
+    grid-template-rows: 400px 400px 1fr;
+    grid-template-columns: 300px repeat(4, 400px);
+    height: 100vh;
+}
+
+.roster {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    background: #f5f5f5;
+    padding: 1em;
+    overflow-y: auto;
+}
+.experiment-row {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 20px 100px 1fr 50px;
+    grid-gap: 3px;
+    align-items: center;
+    padding: 2px 0;
+}
+.experiment-row.all {
+    font-style: italic;
+}
+.experiment-row input[type=checkbox] {
+    cursor: pointer;
+    grid-column: 1;
+}
+.experiment-row span {
+    cursor: pointer;
+    display: inline-block;
+    padding-bottom: 2px;
+    grid-column: 2;
+    user-select: none;
+}
+.experiment-row input[type=color], .experiment-row button {
+    grid-column: 4;
+    padding: 0;
+    width: 50px;
+    inline-size: 50px;
+}
+.experiment-row button {
+    padding: 0;
+    margin: 0;
+    line-height: 10px;
+}
+
+.chart-container canvas {
+}
