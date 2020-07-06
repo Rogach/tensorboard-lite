@@ -19,7 +19,7 @@ body {
 .experiment-row {
     display: grid;
     grid-template-rows: 1fr;
-    grid-template-columns: 20px 100px 1fr 50px;
+    grid-template-columns: 20px 100px 1fr 18px 50px;
     grid-gap: 3px;
     align-items: center;
     padding: 2px 0;
@@ -31,20 +31,31 @@ body {
     cursor: pointer;
     grid-column: 1;
 }
-.experiment-row span {
+.experiment-row span.name {
     cursor: pointer;
     display: inline-block;
     padding-bottom: 2px;
     grid-column: 2;
     user-select: none;
 }
-.experiment-row input[type=color], .experiment-row button {
+.experiment-row span.shuffle {
     grid-column: 4;
+    cursor: pointer;
+    padding: 0;
+    padding-inline: 0;
+    user-select: none;
+    display: none;
+}
+.experiment-row:hover span.shuffle {
+    display: inline-block;
+}
+.experiment-row input[type=color], .experiment-row button.reset-colors {
+    grid-column: 5;
     padding: 0;
     width: 50px;
     inline-size: 50px;
 }
-.experiment-row button {
+.experiment-row button.reset-colors {
     padding: 0;
     margin: 0;
     line-height: 10px;

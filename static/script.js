@@ -92,6 +92,7 @@ let Roster = (props) => {
       }),
       h("span", null, "All"),
       h("button", {
+        className: "reset-colors",
         onClick: () => {
           props.setColors(Immutable.Map());
         }
@@ -126,8 +127,19 @@ let ExperimentRow = (props) => {
       onChange: (e) => props.onSelectionChange(e.target.checked)
     }),
     h("span", {
+      className: "name",
       onClick: () => props.onSelectionChange(!props.isSelected)
     }, props.name),
+    h("span", {
+      className: "shuffle",
+      onClick: () => {
+        let newColor;
+        do {
+          newColor = palette[Math.floor(Math.random() * 10)];
+        } while (newColor === props.color);
+        props.onColorChange(newColor);
+      }
+    }, "🔀"),
     h("input", {
       type: "color",
       value: props.color || defaultColor(props.name),
