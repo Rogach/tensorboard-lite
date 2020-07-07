@@ -202,7 +202,7 @@ function createChartOptions(data, deselected, colors, seriesName) {
 
 function createChartDatasets(data, deselected, colors, seriesName) {
   let datasets = [];
-  _.chain(data).entries().sortBy(0).forEach(([name, series]) => {
+  _.chain(data).entries().sortBy(0).reverse().forEach(([name, series]) => {
     if (!deselected.has(name) && _.has(series, seriesName)) {
       datasets.push({
         label: name,
