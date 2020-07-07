@@ -209,7 +209,7 @@ function createChartDatasets(data, deselected, colors, seriesName) {
         data: _.map(series[seriesName], (v, i) => ({x: i, y: v})),
         fill: false,
         lineTension: 0,
-        pointRadius: 0,
+        pointRadius: series[seriesName].length > 1 ? 0 : 3,
         pointHitRadius: 5,
         borderColor: colors.get(name) || defaultColor(name),
         borderWidth: 2,
