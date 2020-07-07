@@ -185,9 +185,6 @@ function createChartOptions(data, deselected, colors, seriesName) {
       tooltips: {
         caretPadding: 15,
         mode: "index",
-        callbacks: {
-          title: () => ""
-        }
       },
       scales: {
         xAxes: [{
