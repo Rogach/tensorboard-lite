@@ -203,7 +203,7 @@ function createChartDatasets(data, deselected, colors, seriesName) {
     if (!deselected.has(name) && _.has(series, seriesName)) {
       datasets.push({
         label: name,
-        data: _.map(series[seriesName], (v, i) => ({x: i, y: v})),
+        data: _.map(series[seriesName], (v, i) => ({x: i+1, y: v})),
         fill: false,
         lineTension: 0,
         pointRadius: series[seriesName].length > 1 ? 0 : 3,
