@@ -86,6 +86,7 @@ listening_sockets = []
 event_loop = asyncio.get_event_loop()
 
 async def send_to_all_sockets(data):
+    global cached_data
     cached_data = data
     for ws in listening_sockets:
         await ws.send_json(data)
