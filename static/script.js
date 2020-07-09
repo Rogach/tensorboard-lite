@@ -4,6 +4,7 @@ let App = () => {
   let [data, setData] = React.useState({});
   let [deselected, setDeselected] = React.useState(Immutable.Set(JSON.parse(localStorage["deselected"] || "[]")));
   let [colors, setColors] = React.useState(Immutable.Map(JSON.parse(localStorage["colors"] || "{}")));
+  let [focus, setFocus] = React.useState(JSON.parse(localStorage["focus"] || "null"));
 
   React.useEffect(() => {
     let socket = new ReconnectingWebSocket("ws://" + location.host + "/socket");
@@ -18,6 +19,7 @@ let App = () => {
   React.useEffect(() => {
     localStorage["deselected"] = JSON.stringify(deselected.toJSON());
     localStorage["colors"] = JSON.stringify(colors.toJSON());
+    localStorage["focus"] = JSON.stringify(focus);
   });
 
   return h(
@@ -28,47 +30,49 @@ let App = () => {
       setDeselected: setDeselected,
       colors: colors,
       setColors: setColors,
+      focus: focus,
+      setFocus: setFocus,
     }),
 
     h(ChartContainer, {
       gridRow: 1, gridColumn: 2,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "loss"
     }),
     h(ChartContainer, {
       gridRow: 1, gridColumn: 3,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "acc"
     }),
     h(ChartContainer, {
       gridRow: 1, gridColumn: 4,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "fp"
     }),
     h(ChartContainer, {
       gridRow: 1, gridColumn: 5,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "fn"
     }),
 
     h(ChartContainer, {
       gridRow: 2, gridColumn: 2,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "val_loss"
     }),
     h(ChartContainer, {
       gridRow: 2, gridColumn: 3,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "val_acc"
     }),
     h(ChartContainer, {
       gridRow: 2, gridColumn: 4,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "val_fp"
     }),
     h(ChartContainer, {
       gridRow: 2, gridColumn: 5,
-      data: data, deselected: deselected, colors: colors,
+      data: data, deselected: deselected, colors: colors, focus: focus,
       seriesName: "val_fn"
     }),
   );
@@ -112,7 +116,9 @@ let Roster = (props) => {
           }
         },
         color: props.colors.get(name),
-        onColorChange: (c) => props.setColors(props.colors.set(name, c))
+        onColorChange: (c) => props.setColors(props.colors.set(name, c)),
+        focus: props.focus,
+        setFocus: props.setFocus,
       })
     ).value()
   )
@@ -128,8 +134,18 @@ let ExperimentRow = (props) => {
     }),
     h("span", {
       className: "name",
-      onClick: () => props.onSelectionChange(!props.isSelected)
-    }, props.name),
+      onClick: (e) => {
+        if (e.ctrlKey) {
+          if (props.focus === props.name) {
+            props.setFocus(null);
+          } else {
+            props.setFocus(props.name);
+          }
+        } else {
+          props.onSelectionChange(!props.isSelected)
+        }
+      }
+    }, props.name + (props.focus === props.name ? " 🞋" : "")),
     h("span", {
       className: "shuffle",
       onClick: () => {
@@ -153,14 +169,16 @@ let ChartContainer = (props) => {
   let chart = React.useRef();
   let chartCanvasRef = React.useRef();
   React.useEffect(() => {
-    let chartOptions = createChartOptions(props.data, props.deselected, props.colors, props.seriesName);
+    let chartOptions = createChartOptions(props.data, props.deselected, props.colors, props.focus, props.seriesName);
     chart.current = new Chart(chartCanvasRef.current.getContext("2d"), chartOptions);
   }, []);
 
   React.useEffect(() => {
-    chart.current.data.datasets = createChartDatasets(props.data, props.deselected, props.colors, props.seriesName);
+    chart.current.data.datasets = createChartDatasets(
+      props.data, props.deselected, props.colors, props.focus, props.seriesName
+    );
     chart.current.update();
-  }, [props.data, props.deselected, props.colors, props.seriesName])
+  }, [props.data, props.deselected, props.colors, props.focus, props.seriesName])
 
   return h(
     "div", {className: "chart-container", style: {gridRow: props.gridRow, gridColumn: props.gridColumn}},
@@ -168,11 +186,11 @@ let ChartContainer = (props) => {
   );
 };
 
-function createChartOptions(data, deselected, colors, seriesName) {
+function createChartOptions(data, deselected, colors, focus, seriesName) {
   let opts = {
     type: "line",
     data: {
-      datasets: createChartDatasets(data, deselected, colors, seriesName)
+      datasets: createChartDatasets(data, deselected, colors, focus, seriesName)
     },
     options: {
       animation: { duration: 0 },
@@ -197,7 +215,7 @@ function createChartOptions(data, deselected, colors, seriesName) {
   return opts;
 }
 
-function createChartDatasets(data, deselected, colors, seriesName) {
+function createChartDatasets(data, deselected, colors, focus, seriesName) {
   let datasets = [];
   _.chain(data).entries().sortBy(0).reverse().forEach(([name, series]) => {
     if (!deselected.has(name) && _.has(series, seriesName)) {
@@ -209,7 +227,7 @@ function createChartDatasets(data, deselected, colors, seriesName) {
         pointRadius: series[seriesName].length > 1 ? 0 : 3,
         pointHitRadius: 5,
         borderColor: colors.get(name) || defaultColor(name),
-        borderWidth: 2,
+        borderWidth: name === focus ? 3 : 1,
       });
     }
   }).value();

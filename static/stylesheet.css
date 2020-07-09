@@ -37,6 +37,7 @@ body {
     padding-bottom: 2px;
     grid-column: 2;
     user-select: none;
+    line-height: 15px;
 }
 .experiment-row span.shuffle {
     grid-column: 4;
