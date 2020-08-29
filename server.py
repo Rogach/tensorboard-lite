@@ -94,9 +94,10 @@ async def send_to_all_sockets(data):
 def listen_for_new_data():
     for event in inotify.adapters.InotifyTree(args.logs_dir).event_gen(yield_nones=False):
         _, event_types, path, filename = event
-        # rsync first downloads the data to temporary file,
-        # then moves the file to final location
-        if "IN_MOVED_TO" in event_types:
+        # IN_MODIFY: local process writes log files directly
+        # IN_MOVED_TO: rsync first downloads the data to temporary file,
+        #              then moves the file to final location
+        if "IN_MOVED_TO" in event_types or "IN_MODIFY" in event_types:
             data = load_data(args.logs_dir)
             asyncio.run_coroutine_threadsafe(send_to_all_sockets(data), event_loop)
 Thread(target=listen_for_new_data, args=[], daemon=True).start()
