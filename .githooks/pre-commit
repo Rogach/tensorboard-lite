@@ -1,5 +1,6 @@
 #!/bin/bash
 
+unset GIT_LITERAL_PATHSPECS # to make hooks work in Magit
 if git diff --staged -- ':(exclude).githooks' | grep -C 2 NOCOMMIT; then
     exit 1
 fi
